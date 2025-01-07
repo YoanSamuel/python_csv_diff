@@ -37,7 +37,6 @@ $uniqueIdRowIndex = null;
 $diffedRows = array();
 $cSkipped = 0;
 while ($row = fgetcsv($handle, 0, ';')) {
-
     if ($loop === 1){
         $uniqueIdRowIndex = getIndexOf($sharedUniqueId, $row);
         if (is_null($uniqueIdRowIndex)){

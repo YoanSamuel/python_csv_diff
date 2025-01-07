@@ -20,15 +20,25 @@ function normalize($value) {
 // Fonction pour extraire une URL sans le segment de catégorie
 function normalizeUrl($url) {
     $parsedUrl = parse_url($url);
+
+    // Si l'URL n'est pas valide ou n'a pas de chemin, on la retourne telle quelle
     if (!isset($parsedUrl['path'])) {
-        return $url; // Si l'URL n'a pas de chemin, on la retourne telle quelle
+        return $url;
     }
+
     $path = $parsedUrl['path'];
+
     // Supprimer la partie entre les deux premiers "/" dans le chemin
-    return preg_replace('#^/[^/]+/#', '/', $path);
+    $normalizedPath = preg_replace('#^/[^/]+/#', '/', $path);
+
+    // Reconstruire l'URL sans le fragment (#)
+    $scheme = isset($parsedUrl['scheme']) ? $parsedUrl['scheme'] . '://' : '';
+    $host = $parsedUrl['host'] ?? '';
+    $query = isset($parsedUrl['query']) ? '?' . $parsedUrl['query'] : '';
+
+    return $scheme . $host . $normalizedPath . $query;
 }
 
-// Fonction pour obtenir l'index d'une colonne par son titre
 function getIndexOf($value, $arrayData) {
     foreach ($arrayData as $index => $itemValue) {
         if (normalize($itemValue) === normalize($value)) {
@@ -94,7 +104,6 @@ while (($row = fgetcsv($handle, 0, ';')) !== false) {
     } else {
         // Normaliser l'URL avant la comparaison
         $id = normalizeUrl($row[$uniqueIdRowIndex]);
-        var_dump($id);
         if (in_array($id, $uniqueIds)) {
             echo "Skipped (same unique id found): {$id}\n";
             $cSkipped++;
